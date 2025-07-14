@@ -2,11 +2,9 @@
 
 ## Lab Overview
 
-In this lab, you will deploy a real-time chat application to AWS using multiple EC2 instances behind an Application Load Balancer (ALB), then set up local monitoring and load testing to observe application behavior under normal conditions and during simulated failures.
+In this lab, we will deploy a real-time chat application to AWS using multiple EC2 instances behind an Application Load Balancer (ALB), then set up local monitoring and load testing to observe application behavior under normal conditions and during simulated failures.
 
 ## Objectives
-
-By the end of this lab, you will:
 
 1. **Deploy** a chat application to AWS EC2 instances with Redis backend
 2. **Configure** local Prometheus and Grafana monitoring to track application metrics
