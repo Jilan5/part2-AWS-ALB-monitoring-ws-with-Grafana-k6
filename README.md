@@ -63,8 +63,8 @@ curl http://server2-ip:80/metrics
 
 ```bash
 # Clone the monitoring configuration
-git clone https://github.com/your-org/monitoring-repo.git
-cd monitoring-repo/tmp/monitoring
+git clone <Current REPO>
+cd /monitoring
 ```
 
 ### 2.2 Configure Prometheus Targets
