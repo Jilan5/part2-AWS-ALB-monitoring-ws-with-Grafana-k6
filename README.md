@@ -28,7 +28,7 @@ By the end of this lab, you will:
 ## Part 1: Deploy Chat Application to AWS
 
 ### 1.1 Clone and Deploy the Application
-
+### Repo Link - https://github.com/Jilan5/scaling-websocket-with-AWS-ALB.git
 Follow the deployment tutorial in the main repository to deploy the chat application using Pulumi. This will create:
 - 2 EC2 instances running the chat app
 - 1 EC2 instance running Redis  
