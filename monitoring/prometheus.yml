@@ -1,0 +1,43 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+rule_files:
+  # - "rules/alert_rules.yml"
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # App Server 1 on EC2
+  - job_name: 'app-server-1'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['47.128.65.239:80']  # Replace with EC2 public IP or DNS
+        labels:
+          instance: 'app-server-001'
+          environment: 'production'
+          
+  # App Server 2 on EC2
+  - job_name: 'app-server-2'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['54.151.135.190:80']  # Replace with EC2 public IP or DNS
+        labels:
+          instance: 'app-server-002'
+          environment: 'production'
+
+  - job_name: 'AWS Load Balancer'
+    static_configs:
+      - targets: ['chat-alb-c93c74b-682749944.ap-southeast-1.elb.amazonaws.com:80']
+    metrics_path: '/metrics'
+    
+  # Redis Exporter on EC2
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['175.41.164.137:6379']  # Replace with Redis EC2 public IP or DNS
+        labels:
+          instance: 'redis-server'
+          environment: 'production'

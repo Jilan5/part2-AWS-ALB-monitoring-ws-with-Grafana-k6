@@ -1,0 +1,293 @@
+{
+  "dashboard": {
+    "id": null,
+    "uid": "websocket-chaos-testing",
+    "title": "WebSocket Chaos Testing Dashboard",
+    "tags": ["websocket", "chaos", "containers", "ec2", "alb"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "🌐 Server Health Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"app-server-1\"}",
+            "refId": "A",
+            "legendFormat": "Server 1"
+          },
+          {
+            "expr": "up{job=\"app-server-2\"}",
+            "refId": "B",
+            "legendFormat": "Server 2"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"text": "DOWN"}}, "type": "value"},
+              {"options": {"1": {"text": "UP"}}, "type": "value"}
+            ]
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "📊 WebSocket Connections",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(websocket_connections_total)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 8, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "🔥 HTTP Request Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[1m]))",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {"mode": "palette-classic"},
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 8, "w": 8, "x": 16, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "📈 WebSocket Connections Over Time",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "websocket_connections_total{job=~\"app-server-1|app-server-2\"}",
+            "refId": "A",
+            "legendFormat": "{{instance}} connections"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "pointSize": 5,
+              "showPoints": "always",
+              "connectNulls": false
+            },
+            "color": {"mode": "palette-classic"},
+            "unit": "short"
+          }
+        },
+        "gridPos": {"h": 9, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "📨 WebSocket Messages Rate",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(websocket_messages_total{job=~\"app-server-1|app-server-2\"}[1m])",
+            "refId": "A",
+            "legendFormat": "{{instance}} - {{direction}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "pointSize": 5,
+              "showPoints": "always",
+              "connectNulls": false
+            },
+            "color": {"mode": "palette-classic"},
+            "unit": "msgps"
+          }
+        },
+        "gridPos": {"h": 9, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 6,
+        "title": "🌍 HTTP Requests by Instance",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=~\"app-server-1|app-server-2\"}[1m])",
+            "refId": "A",
+            "legendFormat": "{{instance}} - {{endpoint}} - {{status_code}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "pointSize": 5,
+              "showPoints": "always",
+              "connectNulls": false
+            },
+            "color": {"mode": "palette-classic"},
+            "unit": "reqps"
+          }
+        },
+        "gridPos": {"h": 9, "w": 12, "x": 0, "y": 17}
+      },
+      {
+        "id": 7,
+        "title": "⚠️ Error Rate Percentage",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=~\"app-server-1|app-server-2\",status_code=~\"5..\"}[1m]) / rate(http_requests_total{job=~\"app-server-1|app-server-2\"}[1m]) * 100",
+            "refId": "A",
+            "legendFormat": "{{instance}} Error Rate %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 3,
+              "fillOpacity": 20,
+              "pointSize": 6,
+              "showPoints": "always",
+              "connectNulls": false
+            },
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "steps": [
+                {"color": "green", "value": 0},
+                {"color": "yellow", "value": 1},
+                {"color": "red", "value": 5}
+              ]
+            },
+            "unit": "percent",
+            "min": 0,
+            "max": 100
+          }
+        },
+        "gridPos": {"h": 9, "w": 12, "x": 12, "y": 17}      },
+      {
+        "id": 8,
+        "title": "🚨 Server Status Alert Panel",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"app-server-1\"}",
+            "refId": "A",
+            "legendFormat": "Server 1"
+          },
+          {
+            "expr": "up{job=\"app-server-2\"}",
+            "refId": "B",
+            "legendFormat": "Server 2"
+          }
+        ],
+        "options": {
+          "orientation": "auto",
+          "textMode": "auto",
+          "colorMode": "background",
+          "graphMode": "none",
+          "justifyMode": "auto",
+          "reduceOptions": {
+            "calcs": ["lastNotNull"],
+            "fields": "",
+            "values": false
+          }
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            },
+            "mappings": [
+              {"options": {"0": {"color": "red", "text": "DOWN ❌"}}, "type": "value"},
+              {"options": {"1": {"color": "green", "text": "UP ✅"}}, "type": "value"}
+            ]
+          }
+        },
+        "gridPos": {"h": 9, "w": 24, "x": 0, "y": 26}
+      },
+      {
+        "id": 9,
+        "title": "💾 Application Uptime",
+        "type": "timeseries",
+        "targets": [
+          {
+            "expr": "app_uptime_seconds{job=~\"app-server-1|app-server-2\"}",
+            "refId": "A",
+            "legendFormat": "{{instance}} Uptime"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "fillOpacity": 10,
+              "pointSize": 5,
+              "showPoints": "always",
+              "connectNulls": false
+            },
+            "color": {"mode": "palette-classic"},
+            "unit": "s"
+          }
+        },
+        "gridPos": {"h": 9, "w": 24, "x": 0, "y": 35}
+      }
+    ],
+    "time": {
+      "from": "now-10m",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "annotations": {
+      "list": [
+        {
+          "name": "Chaos Events",
+          "datasource": "Prometheus",
+          "enable": true,
+          "expr": "changes(up[1m]) > 0",
+          "textFormat": "Service state change"
+        }
+      ]
+    }
+  }
+}
