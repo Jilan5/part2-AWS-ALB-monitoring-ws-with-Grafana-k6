@@ -105,7 +105,7 @@ chmod +x configure-grafana.sh
 # Password: admin123
 ```
 
-**Screenshot Space: Grafana Dashboard - Both Servers Running**
+### **Case 1: Grafana Dashboard - Both Servers Running**
 <img width="1907" height="926" alt="Screenshot from 2025-07-14 18-52-42" src="https://github.com/user-attachments/assets/a33bac40-c9bf-486c-9098-cf0a9c6e3338" />
 <img width="1866" height="971" alt="Screenshot from 2025-07-14 18-54-04" src="https://github.com/user-attachments/assets/493e6a79-fb33-45bc-88f2-13bc748496c9" />
 
@@ -141,7 +141,7 @@ curl http://localhost:9090/api/v1/targets | grep health
 # - Connection handling behavior
 ```
 
-**Screenshot Space: Grafana Dashboard - One Server Down**
+### **Case 2: Grafana Dashboard - One Server Down**
 <img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-45" src="https://github.com/user-attachments/assets/ace1fc9e-f821-45d0-b227-d802ab395694" />
 <img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-58" src="https://github.com/user-attachments/assets/f843226a-1fa6-48b7-bf29-3039557cea66" />
 
@@ -192,7 +192,7 @@ k6 run cloud-ws-test.js
 k6 cloud cloud-ws-test.js
 ```
 
-**Screenshot Space: k6 Load Test Results**
+**Case 3: k6 Load Test Results**
 <img width="1919" height="933" alt="Screenshot from 2025-07-14 19-38-22" src="https://github.com/user-attachments/assets/d3039a41-8b8e-4301-9306-e73ae06ef682" />
 <img width="1919" height="933" alt="Screenshot from 2025-07-14 19-46-09" src="https://github.com/user-attachments/assets/28ec40be-cb5a-46e8-9641-1d35aae09cdb" />
 
