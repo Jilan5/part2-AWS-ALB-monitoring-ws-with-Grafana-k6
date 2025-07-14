@@ -1,4 +1,4 @@
-# AWS Chat Application Monitoring and Load Testing Lab
+# AWS Chat Application Monitoring and Load Testing using Grafan k6
 <img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-45" src="https://github.com/user-attachments/assets/1b5d0f9b-e04a-4fd8-8d67-39c0ee1506dc" />
 
 ## Lab Overview
