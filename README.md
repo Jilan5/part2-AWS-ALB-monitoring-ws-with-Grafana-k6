@@ -321,7 +321,8 @@ If you prefer to use the pre-built dashboard instead of creating a custom one, y
 
 ---
 
-## Part 4: Chaos Testing - Simulate Server Failure
+## Part 4: Chaos Testing - Grafana K6
+<img width="2390" height="819" alt="image" src="https://github.com/user-attachments/assets/7465ad8d-d2a5-4be4-ba66-03e5cc5e5d95" />
 
 ### 4.1 Stop One Server Instance
 
