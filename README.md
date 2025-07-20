@@ -308,13 +308,11 @@ chmod +x configure-grafana.sh
   - Login: admin/admin (change on first login)
   - Import dashboard or use auto-provisioned one
 
-### 3.3 Dashboard Import Alternative
 
-If you prefer to use the pre-built dashboard instead of creating a custom one, you can use the automated dashboard import method described above in section 3.1.
 
-### **Case 1: Grafana Dashboard - Both Servers Running**
+### Pre-built Dashboard
 <img width="1907" height="926" alt="Screenshot from 2025-07-14 18-52-42" src="https://github.com/user-attachments/assets/a33bac40-c9bf-486c-9098-cf0a9c6e3338" />
-<img width="1866" height="971" alt="Screenshot from 2025-07-14 18-54-04" src="https://github.com/user-attachments/assets/493e6a79-fb33-45bc-88f2-13bc748496c9" />
+
 
 
 
@@ -324,59 +322,28 @@ If you prefer to use the pre-built dashboard instead of creating a custom one, y
 ## Part 4: Chaos Testing - Grafana K6
 <img width="2390" height="819" alt="image" src="https://github.com/user-attachments/assets/7465ad8d-d2a5-4be4-ba66-03e5cc5e5d95" />
 
-### 4.1 Stop One Server Instance
+### 4.1 Install k6
 
+**On Ubuntu/Debian:**
 ```bash
-# SSH to one of your EC2 instances
-ssh -i your-key.pem ubuntu@server-2-ip
-
-# Stop the chat application container
-sudo docker stop chat-app-container-name
-
-# Or stop the entire instance from AWS Console
-```
-
-### 4.2 Observe Metrics During Failure
-
-```bash
-# Check Prometheus targets status
-curl http://localhost:9090/api/v1/targets | grep health
-
-# Monitor Grafana dashboard for changes
-# Watch for:
-# - Server health status changes
-# - Traffic redistribution to remaining server
-# - Connection handling behavior
-```
-
-### **Case 2: Grafana Dashboard - One Server Down**
-<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-45" src="https://github.com/user-attachments/assets/ace1fc9e-f821-45d0-b227-d802ab395694" />
-<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-58" src="https://github.com/user-attachments/assets/f843226a-1fa6-48b7-bf29-3039557cea66" />
-
-
-
----
-
-## Part 5: Load Testing with k6
-
-### 5.1 Install k6
-
-```bash
-# On Ubuntu/Debian
 sudo gpg -k
 sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
 echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
 sudo apt-get update
 sudo apt-get install k6
+```
 
-# On macOS
+**On macOS:**
+```bash
 brew install k6
+```
 
-# On Windows
+**On Windows:**
+```bash
 choco install k6
 ```
 
-### 5.2 Configure Load Test Script
+### 4.2 Configure Load Test Script
 
 Update the `cloud-ws-test.js` file with your actual ALB endpoint:
 - Replace `ALB_ENDPOINT` with your actual ALB DNS name
@@ -387,54 +354,108 @@ Update the `cloud-ws-test.js` file with your actual ALB endpoint:
 nano cloud-ws-test.js
 ```
 
-### 5.3 Run Load Tests
+### 4.3 Test Scenario Overview
+
+Our chaos testing scenario simulates real-world failure conditions while monitoring system behavior:
+
+**Test Configuration (`cloud-ws-test.js`):**
+```javascript
+export const options = {
+  vus: 20,           // 20 virtual users
+  duration: '2m',    // 2-minute test duration
+  
+  thresholds: {
+    'http_errors': ['rate<0.2'],        // Less than 20% HTTP error rate
+    'ws_connect_fail': ['rate<0.2'],    // Less than 20% WebSocket connection failure
+    'message_sent': ['count>100'],      // Ensure we're sending many messages
+  }
+};
+```
+
+**What the test does:**
+- Each virtual user connects via WebSocket to: `ws://ALB_ENDPOINT/ws/client_ID`
+- Performs HTTP health checks: `GET /health`
+- Sends 5-6 chat messages per connection
+- Tracks connection success, message delivery, and error rates
+
+**Chaos Testing Steps:**
+1. Run baseline test with both servers healthy
+2. Start load test, then simulate server failure mid-test
+3. Observe real-time impact on metrics and user experience
+4. Monitor recovery when server comes back online
+
+### 4.4 Case 1: Baseline Performance (Both Servers Healthy)
+
+First establish baseline performance before introducing chaos:
 
 ```bash
-# Test with both servers running
+# Run baseline test
 k6 run cloud-ws-test.js
-
-# Simulate server failure during test (stop one server mid-test)
-# Run test again and observe behavior
-
-# For cloud testing (optional)
-k6 cloud cloud-ws-test.js
 ```
 
-**Case 3: k6 Load Test Results**
-<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-38-22" src="https://github.com/user-attachments/assets/d3039a41-8b8e-4301-9306-e73ae06ef682" />
-<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-46-09" src="https://github.com/user-attachments/assets/28ec40be-cb5a-46e8-9641-1d35aae09cdb" />
+**Expected Behavior:**
+- Load distributed across both app servers
+- Low error rates and consistent response times
+- All WebSocket connections succeed
+- Stable message delivery rates
 
+**Case 1: k6 Load Test Results - Both Servers Healthy**
+<img width="1907" height="926" alt="Screenshot from 2025-07-14 18-52-42" src="https://github.com/user-attachments/assets/a33bac40-c9bf-486c-9098-cf0a9c6e3338" />
+<img width="1866" height="971" alt="Screenshot from 2025-07-14 18-54-04" src="https://github.com/user-attachments/assets/493e6a79-fb33-45bc-88f2-13bc748496c9" />
 
+Monitor your Grafana dashboard during baseline to observe normal patterns.
 
-- `{instance!="localhost"}` - Not equal
+### 4.5 Case 2: k6 Load Test Results - Server Failure
 
----
-
-## Part 6: Analysis and Observations
-
-### 6.1 Expected Behaviors
-
-- **Both Servers Healthy**: Load distributed across both instances
-- **One Server Down**: All traffic redirected to healthy server
-- **Load Testing**: WebSocket connections and message rates visible in dashboard
-- **Recovery**: Metrics return to normal when failed server is restored
-
----
-
-## Cleanup
+Now simulate server failure while under active load:
 
 ```bash
-# Stop monitoring stack
-docker-compose down
+# Start load test (keep running)
+k6 run --duration=5m cloud-ws-test.js
 
-# Remove volumes (optional)
-docker-compose down -v
-
-# Clean up AWS resources
-# - Terminate EC2 instances
-# - Delete Load Balancer
-# - Clean up security groups
+# In another terminal, SSH to server and stop it
+ssh -i your-key.pem ubuntu@server-2-ip
+sudo docker stop chat-app-container-name
 ```
+
+**Expected Impact:**
+- Temporary spike in connection failures
+- Traffic redistribution to remaining server
+- Some WebSocket connections may drop
+- System should recover and continue serving requests
+
+<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-38-22" src="https://github.com/user-attachments/assets/d3039a41-8b8e-4301-9306-e73ae06ef682" />
+
+<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-45" src="https://github.com/user-attachments/assets/ace1fc9e-f821-45d0-b227-d802ab395694" />
+<img width="1919" height="933" alt="Screenshot from 2025-07-14 19-15-58" src="https://github.com/user-attachments/assets/f843226a-1fa6-48b7-bf29-3039557cea66" />
+
+
+
+
+### 4.6 Observe Metrics During Failure
+
+Monitor real-time changes in your dashboards:
+
+```bash
+# Check Prometheus targets status
+curl http://localhost:9090/api/v1/targets | grep health
+
+# Watch for these changes in Grafana:
+# - Server health status changes from UP to DOWN
+# - Traffic redistribution patterns
+# - WebSocket connection behavior
+# - Error rate spikes and recovery time
+```
+
+**Key Metrics to Watch:**
+- Server uptime indicators
+- HTTP request success rates
+- WebSocket connection counts
+- Message delivery statistics
+
+
+
+
 
 ---
 
