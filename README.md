@@ -22,7 +22,8 @@ In this lab, we will deploy a real-time chat application to AWS using multiple E
 - **Load Balancer**: Monitor ALB health and traffic distribution
 
 ---
-<img width="1262" height="409" alt="Untitled-2025-07-20-1255" src="https://github.com/user-attachments/assets/ce2d0ee1-7a08-47d4-813e-3d97db1ce89b" />
+<img width="2524" height="819" alt="Untitled-2025-07-20-1255" src="https://github.com/user-attachments/assets/65c6d772-a591-4b46-8651-cc6708db4d37" />
+
 
 
 ## Part 1: Deploy Chat Application and Set Up Monitoring Configuration
